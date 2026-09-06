@@ -1,0 +1,11 @@
+Model: google/owlv2-large-patch14-ensemble
+Image: images/img01.jpg
+
+QUERY: where is the key?
+  score=0.347  box=[886, 718, 938, 737]  label=a key
+  score=0.261  box=[975, 455, 983, 483]  label=a key
+  score=0.170  box=[734, 792, 744, 822]  label=a key
+  score=0.130  box=[989, 699, 1005, 739]  label=a key
+  score=0.129  box=[975, 409, 998, 472]  label=a key
+  score=0.127  box=[480, 249, 490, 264]  label=a key
+

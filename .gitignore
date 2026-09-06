@@ -1,0 +1,31 @@
+# Python virtual environment — never commit this
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Model weights & large binaries
+*.pth
+*.bin
+*.safetensors
+*.onnx
+*.pt
+
+# HuggingFace model cache
+.cache/
+
+# Output images & session logs
+results_qwen3vl/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

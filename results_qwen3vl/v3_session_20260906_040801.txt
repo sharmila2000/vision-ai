@@ -1,0 +1,11 @@
+Model: google/owlv2-large-patch14-ensemble
+Image: images/img01.jpg
+
+QUERY: bag
+
+QUERY: list all objects
+  score=0.738  box=[315, 669, 669, 931]  label=a photo of a laptop
+  score=0.521  box=[436, 50, 532, 81]  label=a photo of glasses
+  score=0.318  box=[886, 718, 938, 737]  label=a photo of a key
+  score=0.209  box=[975, 455, 983, 483]  label=a photo of a key
+

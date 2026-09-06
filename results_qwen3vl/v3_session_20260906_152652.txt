@@ -1,0 +1,50 @@
+Model: google/owlv2-large-patch14-ensemble
+Image: images/img01.jpg
+
+QUERY: where is the tattoo
+  score=0.536  box=[587, 344, 606, 388]  label=a photo of a tattoo
+
+QUERY: pillows count
+  score=0.279  box=[170, 548, 476, 873]  label=a pillows count
+  score=0.249  box=[503, 565, 750, 757]  label=a pillows count
+
+QUERY: jacket
+  score=0.250  box=[668, 664, 793, 850]  label=a jacket
+
+QUERY: books
+
+QUERY: table
+
+QUERY: designes
+  score=0.295  box=[1015, 201, 1104, 666]  label=a designes
+  score=0.274  box=[351, 119, 584, 465]  label=a photo of a designes
+  score=0.220  box=[978, 306, 1165, 369]  label=a designes
+
+QUERY: regulater
+
+QUERY: regulator
+
+QUERY: door stopper
+  score=0.291  box=[975, 409, 998, 472]  label=a door stopper
+  score=0.269  box=[989, 699, 1005, 739]  label=a photo of a door stopper
+
+QUERY: handle
+
+QUERY: door handle
+  score=0.458  box=[975, 409, 998, 472]  label=a door handle
+
+QUERY: beard
+  score=0.302  box=[441, 98, 525, 147]  label=a beard
+
+QUERY: switch
+  score=0.297  box=[1254, 326, 1280, 362]  label=a switch
+  score=0.294  box=[771, 304, 787, 320]  label=a switch
+  score=0.237  box=[711, 302, 729, 323]  label=a photo of a switch
+  score=0.223  box=[730, 302, 749, 322]  label=a photo of a switch
+  score=0.215  box=[1271, 326, 1288, 356]  label=a photo of a switch
+
+QUERY: bentec benlo
+
+QUERY: door
+  score=0.543  box=[899, 61, 1209, 774]  label=a door
+
