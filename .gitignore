@@ -19,9 +19,6 @@ __pycache__/
 # HuggingFace model cache
 .cache/
 
-# Output images & session logs
-results_qwen3vl/
-
 # OS
 .DS_Store
 Thumbs.db
