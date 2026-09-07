@@ -1,9 +1,0 @@
-Model: google/owlv2-base-patch16-ensemble
-Image: images/img01.jpg
-
-QUERY: where is the key?
-  score=0.179  box=[887, 717, 938, 735]  label=a key
-  score=0.115  box=[885, 729, 904, 736]  label=a key
-  score=0.111  box=[480, 251, 490, 268]  label=a key
-  score=0.103  box=[976, 461, 982, 482]  label=a key
-

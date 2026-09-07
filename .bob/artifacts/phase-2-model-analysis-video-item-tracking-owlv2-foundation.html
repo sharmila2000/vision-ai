@@ -1,0 +1,507 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 2 Model Analysis</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 32px 16px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; }
+  h2 { font-size: 15px; font-weight: 700; margin: 28px 0 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+  h3 { font-size: 13.5px; font-weight: 700; margin: 16px 0 6px; color: #1f2328; }
+  p { margin-bottom: 8px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 4px;
+    margin-right: 4px; vertical-align: middle;
+  }
+  .badge-green  { background:#dcfce7; color:#166534; }
+  .badge-blue   { background:#dbeafe; color:#1e40af; }
+  .badge-orange { background:#ffedd5; color:#9a3412; }
+  .badge-purple { background:#ede9fe; color:#5b21b6; }
+  .badge-red    { background:#fee2e2; color:#991b1b; }
+  .badge-gray   { background:#f3f4f6; color:#374151; }
+
+  .model-card {
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 16px 18px; margin-bottom: 14px; background: #f7f8fa;
+  }
+  .model-card.winner { border-color: #3b82d4; background: #f0f6ff; }
+  .model-card.strong { border-color: #7c5cd8; background: #f5f3ff; }
+  .model-card.avoid  { border-color: #e5e7eb; background: #fafafa; opacity: 0.85; }
+
+  .model-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px; flex-wrap: wrap; gap: 6px;
+  }
+  .model-name  { font-size: 14px; font-weight: 700; }
+  .model-org   { font-size: 12px; color: #57606a; }
+  .model-params{ font-size: 12px; color: #57606a; margin-top: 2px; }
+
+  .pros-cons { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+  .pros, .cons { flex: 1; min-width: 200px; }
+  .pros h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing:.05em; margin-bottom:6px; color:#166534; }
+  .cons h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing:.05em; margin-bottom:6px; color:#991b1b; }
+  ul { padding-left: 18px; }
+  li { font-size: 13px; margin-bottom: 3px; }
+
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+  th { background:#f3f4f6; text-align:left; padding:7px 10px; font-weight:700; border-bottom:2px solid #e5e7eb; }
+  td { padding:6px 10px; border-bottom:1px solid #e5e7eb; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  td.score { font-weight:700; text-align:center; }
+  .score-5{color:#166534;} .score-4{color:#3b82d4;} .score-3{color:#d97706;} .score-2{color:#991b1b;}
+
+  .diagram {
+    border:1px solid #e5e7eb; border-radius:8px;
+    padding:16px; background:#f7f8fa; margin:12px 0;
+  }
+  .flow { display:flex; align-items:center; flex-wrap:wrap; gap:0; font-size:12px; margin-bottom:8px; }
+  .flow-box {
+    background:#fff; border:1px solid #d1d5db; border-radius:6px;
+    padding:6px 12px; font-weight:600; white-space:nowrap;
+  }
+  .flow-box.h1 { border-color:#3b82d4; background:#eff6ff; color:#1e40af; }
+  .flow-box.h2 { border-color:#7c5cd8; background:#f5f3ff; color:#5b21b6; }
+  .flow-box.h3 { border-color:#166534; background:#dcfce7; color:#166534; }
+  .flow-arrow { font-size:16px; color:#9ca3af; padding:0 6px; }
+
+  .winner-banner {
+    background:#3b82d4; color:#fff; border-radius:6px;
+    padding:10px 14px; font-size:13px; font-weight:600; margin:12px 0;
+  }
+  .strong-banner {
+    background:#7c5cd8; color:#fff; border-radius:6px;
+    padding:10px 14px; font-size:13px; font-weight:600; margin:12px 0;
+  }
+
+  .callout {
+    border-left:3px solid #3b82d4; padding:10px 14px;
+    background:#f0f6ff; border-radius:0 6px 6px 0;
+    margin-bottom:10px; font-size:13px;
+  }
+  .callout-warn {
+    border-left:3px solid #d97706; padding:10px 14px;
+    background:#fffbeb; border-radius:0 6px 6px 0;
+    margin-bottom:10px; font-size:13px;
+  }
+  .callout-red {
+    border-left:3px solid #dc2626; padding:10px 14px;
+    background:#fef2f2; border-radius:0 6px 6px 0;
+    margin-bottom:10px; font-size:13px;
+  }
+
+  .phase1-box {
+    background:#f0fdf4; border:1px solid #86efac; border-radius:8px;
+    padding:12px 16px; margin:12px 0; font-size:13px;
+  }
+
+  footer {
+    margin-top:40px; padding-top:14px;
+    border-top:1px solid #e5e7eb;
+    text-align:center; font-size:12px; color:#9ca3af;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Phase 2: Video Item Tracking — Model Analysis</h1>
+  <p class="subtitle">Revised analysis grounded in the confirmed Phase 1 final stack: OWLv2-large-patch14-ensemble (not Qwen). Qwen was ruled out due to hallucination and tiny-object detection failures.</p>
+
+  
+  <h2>1. Why OWLv2 is the Phase 1 Winner</h2>
+  <div class="phase1-box">
+    <strong>OWLv2-large-patch14-ensemble</strong> (<code>google/owlv2-large-patch14-ensemble</code>) won Phase 1 for three architectural reasons:
+    <ul style="margin-top:8px">
+      <li><strong>No language generation</strong> — produces boxes directly via patch-similarity scoring, not token prediction. This eliminates the coordinate hallucination that plagued Qwen2.5-VL.</li>
+      <li><strong>Full-resolution patch grid</strong> — the image is divided into fine-grained patches, each compared against the text embedding. Small objects (key on armrest) are caught because no spatial downsampling occurs before matching.</li>
+      <li><strong>Detection-trained, not instruction-tuned</strong> — OWLv2 was trained exclusively on detection tasks (OWL-ViT v2 distillation on COCO, Objects365, OpenImages). It has no "conversation" mode to drift into.</li>
+    </ul>
+  </div>
+  <p>This matters for Phase 2 because the same properties — <strong>no hallucination, patch-level precision, deterministic box output</strong> — are exactly what a reliable per-frame object tracker needs as its detection backbone.</p>
+
+  
+  <h2>2. What Phase 2 Must Do</h2>
+  <div class="callout">
+    <strong>Input:</strong> Video file + natural language query (e.g. "where is the key?")<br />
+    <strong>Required output:</strong> <em>"At 11:03 min, the person picked up the key and placed it in their pocket."</em><br /><br />
+    <strong>Core capabilities needed:</strong>
+    <ul style="margin-top:6px;padding-left:18px">
+      <li>Detect a specific item reliably in each video frame — especially tiny objects</li>
+      <li>Track that item across frames (handle occlusion, fast motion)</li>
+      <li>Detect when an <em>action</em> happens: someone picks up / moves / places the item</li>
+      <li>Produce a <strong>timestamp-anchored natural language answer</strong></li>
+      <li>Handle videos of several minutes length</li>
+    </ul>
+  </div>
+  <p>This splits into two clearly separable sub-problems: <strong>(A) frame-level detection + tracking</strong> and <strong>(B) temporal reasoning + narrative generation</strong>. OWLv2 solves A; a different model is needed for B.</p>
+
+  
+  <h2>3. Recommended Architecture</h2>
+
+  <div class="diagram">
+    <p style="font-size:12px;font-weight:700;color:#57606a;margin-bottom:10px">STAGE 1 — Frame-Level Detection (OWLv2 — reuse from Phase 1)</p>
+    <div class="flow">
+      <div class="flow-box">Video (.mp4)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">OpenCV frame sampler (1–2 fps)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box h1">OWLv2-large (Phase 1)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Per-frame bounding boxes + scores</div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:#57606a;margin:12px 0 10px">STAGE 2 — Object Tracking (ByteTrack / SORT)</p>
+    <div class="flow">
+      <div class="flow-box">OWLv2 boxes per frame</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box h2">ByteTrack / SORT tracker</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Track ID + trajectory timeline</div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:#57606a;margin:12px 0 10px">STAGE 3 — Event Detection (disappearance / interaction)</p>
+    <div class="flow">
+      <div class="flow-box">Track trajectory</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box h2">Disappearance detector + person proximity</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Event list: {timestamp, event_type, actor}</div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:#57606a;margin:12px 0 10px">STAGE 4 — Narrative Generation (LLM / VLM)</p>
+    <div class="flow">
+      <div class="flow-box">Event list + frame snapshot</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box h3">Video LMM or LLM</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">"At 11:03 person put key in pocket"</div>
+    </div>
+  </div>
+
+  
+  <h2>4. Stage 2 — Tracker Model Candidates</h2>
+
+  <div class="model-card winner">
+    <div class="model-header">
+      <div>
+        <div class="model-name">ByteTrack</div>
+        <div class="model-org">ByteDance Research · 2022 · pip: supervision / lap</div>
+        <div class="model-params">No weights — algorithm only (Hungarian + Kalman)</div>
+      </div>
+      <span class="badge badge-green">★ Recommended Tracker</span>
+    </div>
+    <p>ByteTrack is a detection-agnostic tracker: it takes any bounding box list per frame and uses Kalman filtering + Hungarian matching to assign persistent IDs. It uses <em>both</em> high-score and low-score detections to handle occlusion — exactly what OWLv2's variable-confidence output needs.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>✔ Strengths</h4>
+        <ul>
+          <li>Works directly with OWLv2's box output (no model change)</li>
+          <li>Handles occlusion by using low-confidence detections in a second pass</li>
+          <li>Very lightweight — pure NumPy/SciPy, runs on CPU instantly</li>
+          <li>Available in <code>supervision</code> library (Roboflow): one-line install</li>
+          <li>Tracks multiple objects simultaneously (key + person)</li>
+          <li>State-of-the-art on MOT17/MOT20 benchmarks</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>✗ Limitations</h4>
+        <ul>
+          <li>ID switches on very long occlusions (object fully hidden &gt;5s)</li>
+          <li>Requires consistent detection rate (≥1 fps for stable tracks)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card strong">
+    <div class="model-header">
+      <div>
+        <div class="model-name">SAM 2 (Segment Anything Model 2)</div>
+        <div class="model-org">Meta AI · 2024 · pip: sam2</div>
+        <div class="model-params">~80M (SAM2-hiera-small) to 224M (SAM2-hiera-large)</div>
+      </div>
+      <span class="badge badge-purple">Strong — Pixel Precise</span>
+    </div>
+    <p>SAM 2 extends segment-anything to video. Given a bounding box (from OWLv2) on frame 0, SAM 2 propagates a pixel-precise mask of the object across all subsequent frames — including through occlusion and scale changes. Best choice when you need to show <em>exactly where</em> the object is in each frame, not just a bounding box.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>✔ Strengths</h4>
+        <ul>
+          <li>Pixel-level tracking — produces full segmentation mask per frame</li>
+          <li>Can be initialised with OWLv2's bounding box directly</li>
+          <li>Handles scale change, rotation, partial occlusion</li>
+          <li>Produces annotated video output (key highlighted in every frame)</li>
+          <li>Runs on MPS (Apple Silicon) with float32</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>✗ Limitations</h4>
+        <ul>
+          <li>Heavier than ByteTrack — ~2–4 GB VRAM for large model</li>
+          <li>New dependency (<code>sam2</code> package from Meta)</li>
+          <li>Best used for the output annotation layer, not the core event detector</li>
+          <li>Loses track if object fully disappears (expected — in a pocket)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card avoid">
+    <div class="model-header">
+      <div>
+        <div class="model-name">DeepSORT</div>
+        <div class="model-org">Wojke et al. · 2017</div>
+      </div>
+      <span class="badge badge-gray">Older — Skip</span>
+    </div>
+    <p>DeepSORT requires a dedicated Re-ID feature extractor trained on person datasets. The Re-ID model adds complexity and doesn't improve over ByteTrack for object tracking (only helps for person re-identification). ByteTrack supersedes it.</p>
+  </div>
+
+  
+  <h2>5. Stage 4 — Narrative / Reasoning Model Candidates</h2>
+  <p>Once the tracker produces an event list (e.g., <em>key disappeared at frame 662, person was 40px away at frame 660</em>), a model needs to reason about it and produce the human-readable answer. Two viable paths:</p>
+
+  <h3>Path A — Structured Event → LLM (No Vision)</h3>
+  <div class="callout">
+    The tracker outputs a structured event log. A text-only LLM (or even a rule-based formatter) reads the log and produces the narrative. <strong>No video vision needed at this stage.</strong><br /><br />
+    Example input to LLM:<br />
+    <code>"key detected at [823,610] frames 0–661. Disappeared at frame 662. Person bbox [780,580] at frame 660. Video fps=1. Frame 662 = 11:02 min."</code><br /><br />
+    Example LLM output:<br />
+    <code>"At 11:02 min, the key disappeared from the armrest. A person was within close proximity at that moment, suggesting they picked it up."</code>
+  </div>
+
+  <div class="model-card winner">
+    <div class="model-header">
+      <div>
+        <div class="model-name">Qwen2.5-7B-Instruct (Text Only)</div>
+        <div class="model-org">Alibaba · Already available as transformers model</div>
+        <div class="model-params">7B — text-only (no vision), very fast on MPS</div>
+      </div>
+      <span class="badge badge-green">★ Best for Path A</span>
+    </div>
+    <p>The text-only Qwen2.5 Instruct model is an excellent narrator — it takes structured tracker output and produces natural, fluent descriptions. Critically, it <strong>does not look at images</strong>, so Qwen's vision hallucination problem is completely irrelevant here. It only needs to reason about numbers and produce text.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>✔ Strengths</h4>
+        <ul>
+          <li>Qwen family — already familiar, same tokeniser ecosystem</li>
+          <li>Text-only: no hallucination risk on visual data</li>
+          <li>Very fast on MPS/CPU — tracker events are short text</li>
+          <li>Excellent at temporal reasoning ("before", "after", "at time T")</li>
+          <li>Can be replaced with any local Ollama model (llama3, mistral)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>✗ Limitations</h4>
+        <ul>
+          <li>Cannot describe what the scene looks like — only what the tracker reports</li>
+          <li>If tracker is wrong, narrator will be wrong (garbage-in-garbage-out)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Path B — Frame Snapshot + VLM (Vision Confirmation)</h3>
+  <div class="callout">
+    At the detected event timestamp, extract a small clip (±5 seconds). Feed that clip's key frames + the tracker's event data to a Video LMM to produce a richer, visually-grounded answer.
+  </div>
+
+  <div class="model-card strong">
+    <div class="model-header">
+      <div>
+        <div class="model-name">InternVL2.5-8B (Short Clip Mode)</div>
+        <div class="model-org">Shanghai AI Lab · 2024</div>
+        <div class="model-params">8B — open source, runs on MPS</div>
+      </div>
+      <span class="badge badge-purple">Best for Path B</span>
+    </div>
+    <p>InternVL2.5-8B processes up to ~16 frames at high resolution. Used on a <strong>10-second event clip</strong> (extracted by the tracker), it can confirm "yes, the person is holding the key" and produce a visually-grounded sentence. Critically, it's only asked about a short clip — not a 30-minute video — so hallucination risk is low.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>✔ Strengths</h4>
+        <ul>
+          <li>State-of-the-art on short-video VQA (Video-MME benchmark)</li>
+          <li>8B fits on MPS with float16</li>
+          <li>Excellent at describing human-object interactions</li>
+          <li>HuggingFace native — same <code>AutoModel</code> pattern</li>
+          <li>Open source, no API cost</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>✗ Limitations</h4>
+        <ul>
+          <li>New dependency — different model family from Phase 1</li>
+          <li>Adds ~8 GB model weight download</li>
+          <li>Still can hallucinate on ambiguous frames</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card avoid">
+    <div class="model-header">
+      <div>
+        <div class="model-name">Qwen2.5-VL-7B (Video Mode)</div>
+        <div class="model-org">Alibaba · Phase 1 tested</div>
+      </div>
+      <span class="badge badge-red">✗ Ruled Out — Same Problems</span>
+    </div>
+    <div class="callout-red" style="margin-top:8px">
+      Qwen2.5-VL hallucinated on object detection and failed tiny-object detection in Phase 1. These are architectural limitations of its vision encoder and language generation approach — they would surface identically in a video context. Running it over video frames would produce the same hallucinated coordinates and missed small objects at scale. Not recommended.
+    </div>
+  </div>
+
+  <div class="model-card avoid">
+    <div class="model-header">
+      <div>
+        <div class="model-name">Video-LLaVA (2023)</div>
+        <div class="model-org">PKU-YuanGroup</div>
+      </div>
+      <span class="badge badge-gray">Too Limited</span>
+    </div>
+    <p>8 frames maximum, no timestamps, weaker than InternVL2.5. Not worth integrating.</p>
+  </div>
+
+  
+  <h2>6. Comparative Scoring</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Model / Component</th>
+        <th>Role</th>
+        <th>Tiny Object</th>
+        <th>No Hallucination</th>
+        <th>Timestamp Output</th>
+        <th>Local / Free</th>
+        <th>Phase 1 Reuse</th>
+        <th>Verdict</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>OWLv2-large (Phase 1)</strong></td>
+        <td>Frame detector</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-2">—</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td><span class="badge badge-green">Core backbone</span></td>
+      </tr>
+      <tr>
+        <td><strong>ByteTrack</strong></td>
+        <td>Object tracker</td>
+        <td class="score score-4">4/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-4">4/5</td>
+        <td><span class="badge badge-green">★ Stage 2</span></td>
+      </tr>
+      <tr>
+        <td><strong>SAM 2</strong></td>
+        <td>Visual tracker</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-3">3/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-3">3/5</td>
+        <td><span class="badge badge-purple">Optional visual layer</span></td>
+      </tr>
+      <tr>
+        <td><strong>Qwen2.5-7B (text)</strong></td>
+        <td>Event narrator</td>
+        <td class="score score-2">—</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-4">4/5</td>
+        <td><span class="badge badge-green">★ Stage 4 (Path A)</span></td>
+      </tr>
+      <tr>
+        <td><strong>InternVL2.5-8B</strong></td>
+        <td>Visual narrator</td>
+        <td class="score score-4">4/5</td>
+        <td class="score score-4">4/5</td>
+        <td class="score score-4">4/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-2">2/5</td>
+        <td><span class="badge badge-purple">Stage 4 (Path B)</span></td>
+      </tr>
+      <tr>
+        <td><strong>Qwen2.5-VL-7B (vision)</strong></td>
+        <td>Any role</td>
+        <td class="score score-2">2/5</td>
+        <td class="score score-2">2/5</td>
+        <td class="score score-4">4/5</td>
+        <td class="score score-5">5/5</td>
+        <td class="score score-2">2/5</td>
+        <td><span class="badge badge-red">✗ Ruled out</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <h2>7. Final Recommendation</h2>
+
+  <div class="winner-banner">★ Primary Stack: OWLv2 (detect) + ByteTrack (track) + Qwen2.5-7B text (narrate)</div>
+
+  <h3>Why this combination wins</h3>
+  <ul>
+    <li><strong>OWLv2 is already the proven detector</strong> — reuse the exact same model, weights, threshold logic, NMS, and query expansion from Phase 1 on each video frame. Zero new detection risk.</li>
+    <li><strong>ByteTrack is detection-agnostic</strong> — it only needs a list of <code>[x1,y1,x2,y2, score]</code> per frame, which is exactly what OWLv2 already returns. One <code>pip install supervision</code> or a 200-line pure-Python implementation.</li>
+    <li><strong>Qwen2.5-7B text-only narrates events, not pixels</strong> — it never looks at an image, so the vision hallucination problem is completely bypassed. It only reads structured text like "key disappeared at 11:02, person 38px away" and produces natural language.</li>
+  </ul>
+
+  <h3>How the answer "At 11:03 min, the person put the key in their pocket" is produced</h3>
+  <div class="callout">
+    <ol style="padding-left:18px;font-size:13px">
+      <li>OWLv2 detects "key" and "person" in every sampled frame (1 fps).</li>
+      <li>ByteTrack assigns persistent IDs — key gets Track ID 3, person gets Track ID 1.</li>
+      <li>Disappearance detector: Track ID 3 (key) last seen at frame 662 (= 11:02). Person Track ID 1 was 38px from the key at frame 661.</li>
+      <li>Event log: <em>{frame: 662, event: "key_disappeared", person_proximity: "close", timestamp: "11:02"}</em></li>
+      <li>Qwen2.5-7B text reads: "Key was last seen at 11:02. A person was close to it at that moment. What happened?" → <em>"At 11:03, the key was picked up by the person standing nearby."</em></li>
+    </ol>
+  </div>
+
+  <div class="strong-banner">Optional Layer: SAM 2 to produce an annotated output video clip showing the key's tracked path</div>
+
+  
+  <h2>8. Phase 2 Implementation Plan</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Component</th><th>What it does</th><th>New dependency?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Video frame extractor</td><td>OpenCV <code>cv2.VideoCapture</code> at 1 fps</td><td>No (already installed)</td></tr>
+      <tr><td>2</td><td>Per-frame detector</td><td>OWLv2-large — detect item + person per frame</td><td>No (Phase 1 model)</td></tr>
+      <tr><td>3</td><td>Multi-object tracker</td><td>ByteTrack — maintain item + person track IDs across frames</td><td><code>pip install supervision lapjv</code></td></tr>
+      <tr><td>4</td><td>Event detector</td><td>Rule-based: disappearance + person proximity → event log</td><td>No (pure Python)</td></tr>
+      <tr><td>5</td><td>Narrator</td><td>Qwen2.5-7B text-only — convert event log to natural language</td><td>Text-only model, no new vision dependency</td></tr>
+      <tr><td>6</td><td>Annotated clip (optional)</td><td>SAM 2 tracks item visually, OpenCV overlays box on output video</td><td><code>pip install sam2</code> (Meta)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-warn">
+    <strong>Memory note (Apple Silicon):</strong> OWLv2-large runs at float32 on MPS (~1.5 GB). ByteTrack is CPU-only. Qwen2.5-7B text runs at float16 (~4 GB). Total ~5.5 GB — safe on 16 GB unified memory. SAM 2 small adds ~1 GB if used. Processing a 10-minute video at 1 fps (600 frames) takes approximately 8–15 minutes on M1/M2 Max.
+  </div>
+
+  <footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>
