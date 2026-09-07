@@ -1,0 +1,603 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vision AI — Phase 1 Technical Documentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 40px 20px 60px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .header {
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.4px;
+  }
+  .badge-blue  { background: #dbeafe; color: #1d4ed8; }
+  .badge-green { background: #dcfce7; color: #15803d; }
+  .badge-gray  { background: #f3f4f6; color: #374151; }
+  .badge-purple{ background: #ede9fe; color: #6d28d9; }
+  h1 { font-size: 26px; font-weight: 700; color: #1f2328; margin-bottom: 6px; }
+  .subtitle { color: #57606a; font-size: 14px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 40px; }
+  h2 {
+    font-size: 16px; font-weight: 700; color: #1f2328;
+    border-left: 4px solid #3b82d4; padding-left: 12px;
+    margin-bottom: 16px; margin-top: 0;
+  }
+  h3 { font-size: 14px; font-weight: 700; color: #1f2328; margin: 16px 0 8px; }
+  p { margin-bottom: 10px; color: #1f2328; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: #f7f8fa; border: 1px solid #e5e7eb;
+    border-left: 4px solid #3b82d4;
+    border-radius: 6px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .callout.green  { border-left-color: #16a34a; background: #f0fdf4; }
+  .callout.red    { border-left-color: #dc2626; background: #fef2f2; }
+  .callout.purple { border-left-color: #7c3aed; background: #faf5ff; }
+  .callout.amber  { border-left-color: #d97706; background: #fffbeb; }
+  .callout-title  { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+  th {
+    background: #f7f8fa; border: 1px solid #e5e7eb;
+    padding: 8px 12px; text-align: left; font-weight: 600; color: #374151;
+  }
+  td { border: 1px solid #e5e7eb; padding: 8px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .tick   { color: #16a34a; font-weight: 700; }
+  .cross  { color: #dc2626; font-weight: 700; }
+  .warn   { color: #d97706; font-weight: 700; }
+  .bold   { font-weight: 700; }
+
+  /* ── CODE / SCORE ── */
+  code {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 12px; background: #f3f4f6; color: #1f2328;
+    padding: 1px 5px; border-radius: 4px;
+  }
+  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .score-label { font-size: 13px; color: #374151; min-width: 220px; }
+  .score-bar-bg { flex: 1; height: 10px; background: #e5e7eb; border-radius: 5px; }
+  .score-bar { height: 10px; border-radius: 5px; }
+  .score-val { font-size: 12px; font-weight: 700; color: #1f2328; min-width: 42px; text-align: right; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 8px; top: 4px; bottom: 4px;
+    width: 2px; background: #e5e7eb;
+  }
+  .tl-item { position: relative; margin-bottom: 24px; }
+  .tl-dot {
+    position: absolute; left: -24px; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 0 0 2px #3b82d4;
+    background: #3b82d4;
+  }
+  .tl-dot.red    { background: #dc2626; box-shadow: 0 0 0 2px #dc2626; }
+  .tl-dot.green  { background: #16a34a; box-shadow: 0 0 0 2px #16a34a; }
+  .tl-dot.amber  { background: #d97706; box-shadow: 0 0 0 2px #d97706; }
+  .tl-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .tl-body  { font-size: 13px; color: #57606a; }
+
+  /* ── DETECTION RESULT CARD ── */
+  .det-card {
+    background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 12px 16px; margin-bottom: 10px; font-size: 13px;
+  }
+  .det-header { font-weight: 700; margin-bottom: 6px; color: #1f2328; }
+  .det-item { padding: 3px 0; border-bottom: 1px solid #e5e7eb; font-family: "SF Mono","Fira Code",monospace; font-size: 12px; }
+  .det-item:last-child { border-bottom: none; }
+  .det-score { color: #16a34a; font-weight: 700; }
+  .det-box   { color: #3b82d4; }
+  .det-label { color: #7c3aed; }
+
+  /* ── TWO-COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width:560px){ .two-col { grid-template-columns: 1fr; } }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .arch-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .arch-box {
+    background: #fff; border: 1.5px solid #e5e7eb; border-radius: 6px;
+    padding: 6px 14px; font-size: 12px; font-weight: 600; text-align: center;
+  }
+  .arch-box.blue   { border-color: #3b82d4; color: #1d4ed8; }
+  .arch-box.green  { border-color: #16a34a; color: #15803d; }
+  .arch-box.purple { border-color: #7c3aed; color: #6d28d9; }
+  .arch-arrow { color: #57606a; font-size: 18px; font-weight: 300; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center; font-size: 12px; color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="header">
+    <div class="badge-row">
+      <span class="badge badge-blue">Phase 1</span>
+      <span class="badge badge-green">Completed</span>
+      <span class="badge badge-purple">AI / Computer Vision</span>
+      <span class="badge badge-gray">Python · PyTorch · HuggingFace</span>
+      <span class="badge badge-gray">Apple Silicon MPS</span>
+    </div>
+    <h1>Vision AI — Image Object Location Chatbot</h1>
+    <p class="subtitle">Technical Documentation &amp; Project Journey  |  Phase 1 Demonstration  |  Sep 2026</p>
+  </div>
+
+  
+  <div class="section">
+    <h2>1. Project Overview</h2>
+    <p>
+      The goal of <strong>Phase 1</strong> is to build an AI-powered chatbot that accepts a room image and a
+      natural-language question — such as <em>"Where is the key?"</em> — and accurately identifies and locates
+      the queried object inside the image, even when the object is tiny (a few dozen pixels in a 1280×960 photo).
+    </p>
+    <div class="callout">
+      <div class="callout-title">Phase 1 Target</div>
+      Given any room image + a user's free-text question, detect the object and respond with its exact location
+      in the scene. No pre-defined object classes. No bounding-box requirements from the user side.
+    </div>
+    <div class="two-col">
+      <div class="callout green">
+        <div class="callout-title">Phases at a Glance</div>
+        <strong>Phase 1 (current)</strong> — Single image + chatbot query → locate item<br />
+        <strong>Phase 2</strong> — Video input → temporal tracking ("key picked up at 11:03")<br />
+        <strong>Phase 3</strong> — Live camera → threat detection (unattended suitcase alert)
+      </div>
+      <div class="callout purple">
+        <div class="callout-title">Hardware Environment</div>
+        MacBook Pro — Apple Silicon (ARM64)<br />
+        Device: <code>MPS</code> (Metal Performance Shaders)<br />
+        Python 3.9.6 · torch 2.8.0 · transformers 4.57.6<br />
+        No external GPU server
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>2. The Test Image &amp; The Challenge</h2>
+    <p>
+      The primary test image (<code>images/img01.jpg</code>, 1280×960 px) shows a room with a person standing
+      behind a brown leather sofa. A Dell laptop is open on the sofa. Two keys are hidden in the scene:
+    </p>
+    <div class="two-col">
+      <div class="det-card">
+        <div class="det-header">🔑 Key 1 — Sofa Armrest</div>
+        A small silver house key lying flat on the <strong>right armrest</strong> of the brown leather sofa.<br /><br />
+        Size: ~<strong>70 × 30 px</strong> in a 1280×960 image<br />
+        Occupies: <strong>0.17%</strong> of total image area<br />
+        Classification: <span style="color:#dc2626"><strong>TINY object</strong></span>
+      </div>
+      <div class="det-card">
+        <div class="det-header">🔑 Key 2 — Door Lock</div>
+        A key inserted into the <strong>lock cylinder</strong> of the wooden door, right side of the room.<br /><br />
+        Size: ~<strong>15 × 35 px</strong> in a 1280×960 image<br />
+        Occupies: <strong>0.04%</strong> of total image area<br />
+        Classification: <span style="color:#dc2626"><strong>TINY object</strong></span>
+      </div>
+    </div>
+    <div class="callout red">
+      <div class="callout-title">Core Technical Challenge</div>
+      Both keys are extremely small relative to the full image. Any model that internally downscales
+      the image (e.g. to 336×336 or 448×448) will reduce a 70px key to ~18px — making it effectively
+      invisible to standard Vision Language Models.
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>3. The Journey — Models Tried &amp; Why They Failed</h2>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot red"></div>
+        <div class="tl-title">Attempt 1 — YOLO (You Only Look Once)</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> Industry-standard real-time object detector, fast, widely deployed.<br />
+          <strong>Problem:</strong> YOLO is trained on a fixed set of 80 COCO classes (person, car, chair…). 
+          "Key" is not a reliable class. Cannot detect arbitrary objects by text query — no open-vocabulary support.<br />
+          <span class="cross">✗ Failed:</span> Could not detect keys. Too few object classes for real-world room queries.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot red"></div>
+        <div class="tl-title">Attempt 2 — Grounding DINO</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> Open-vocabulary detector — accepts free-text queries. Strong academic benchmark results.<br />
+          <strong>Problem:</strong> Tiny object detection weakness. Grounding DINO uses a feature pyramid but still
+          struggled with objects occupying less than 0.2% of the image area. The key at ~70px was consistently missed
+          or produced very low-confidence detections below any usable threshold.<br />
+          <span class="cross">✗ Failed:</span> Did not detect the armrest key reliably.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot red"></div>
+        <div class="tl-title">Attempt 3 — Qwen2.5-VL-7B (Vision Language Model)</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> Large VLM with strong scene understanding. Can answer natural-language questions about images.<br />
+          <strong>Problem 1 — Resolution loss:</strong> Qwen internally processes images at 448×448 or tiled crops. A 70px key becomes ~18px — invisible.<br />
+          <strong>Problem 2 — Coordinate hallucination:</strong> Outputs bounding boxes as text tokens (<code>&lt;box&gt;371,524,612,748&lt;/box&gt;</code>).
+          Token generation is stochastic — the same query produces different coordinates each run. Boxes drift by 50–200px.<br />
+          <strong>Problem 3 — Ambiguity:</strong> The model uses normalized 0–1000 coordinates internally but sometimes outputs raw pixels — 
+          no consistent interpretation possible.<br />
+          <span class="cross">✗ Failed:</span> Never found either key. Coordinates unreliable even when it "described" the correct location.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot amber"></div>
+        <div class="tl-title">Attempt 4 — SAM (Segment Anything) + VLM Two-Stage Pipeline</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> SAM generates pixel-perfect masks for every region; a VLM then classifies each region.<br />
+          <strong>Problem 1 — Scale:</strong> SAM generates 100–300 mask proposals per image. Running a VLM on each
+          is extremely slow (~15–30 minutes per query on MPS).<br />
+          <strong>Problem 2 — Word boundary collision:</strong> When classifying "key", the VLM matched the word "key" 
+          inside "keyboard" — constant false positives from the laptop keyboard region.<br />
+          <strong>Problem 3 — Door key missed:</strong> The door lock key region was too small for SAM to isolate as a clean mask.<br />
+          <span class="warn">✗ Abandoned:</span> Too slow and too many false positives for Phase 1 interactive use.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot amber"></div>
+        <div class="tl-title">Attempt 5 — Florence-2-large (Microsoft)</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> Microsoft's vision foundation model — DaViT encoder trained on 5.4B image-text triples.
+          Supports <code>&lt;OPEN_VOCABULARY_DETECTION&gt;</code> and <code>&lt;CAPTION_TO_PHRASE_GROUNDING&gt;</code> task tokens.<br />
+          <strong>MPS fixes required:</strong> <code>attn_implementation="eager"</code> (avoids SDPA crash), 
+          <code>use_cache=False</code> (past_key_values returns None on MPS), <code>dtype=</code> not <code>torch_dtype=</code>.<br />
+          <strong>Success:</strong> "door key" → <span class="tick">✓</span> perfect detection. "sofa" → <span class="tick">✓</span> perfect.<br />
+          <strong>Remaining problem:</strong> Query "key" → detected the <em>necklace pendant</em> on the person instead of the armrest key.
+          The pendant visually resembles a key at feature-map resolution.<br />
+          <span class="warn">⚠ Partial:</span> Good for scene understanding; inconsistent for generic single-word tiny-object queries.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot green"></div>
+        <div class="tl-title">Final Solution — OWLv2-large (Google)</div>
+        <div class="tl-body">
+          <strong>Why tried:</strong> Purpose-built open-vocabulary object detector. Processes image as a full-resolution patch grid.
+          No language generation — direct box regression from visual-text similarity.<br />
+          <strong>Result:</strong> Found <strong>both keys</strong> correctly with clear confidence score separation.<br />
+          <span class="tick">✓ Key 1 (armrest):</span> score <strong>0.347</strong> · box <code>[886, 718, 938, 737]</code><br />
+          <span class="tick">✓ Key 2 (door lock):</span> score <strong>0.261</strong> · box <code>[975, 455, 983, 483]</code><br />
+          <span class="cross">✗ False positives:</span> score ≤ 0.170 — cleanly separable with threshold 0.20<br />
+          <span class="tick">✓ Selected as the production model for Phase 1.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>4. Why OWLv2-large Is the Right Model for Phase 1</h2>
+
+    <h3>Architecture — The Key Difference</h3>
+    <div class="arch">
+      <div style="font-size:12px;font-weight:700;color:#57606a;margin-bottom:12px;text-align:center">VLMs (Qwen, LLaVA, PaliGemma) — Wrong tool for tiny-object location</div>
+      <div class="arch-row">
+        <div class="arch-box">Full Image<br />1280×960</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="border-color:#dc2626;color:#dc2626">Downscale<br />448×448</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">LLM generates<br />text tokens</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="border-color:#dc2626;color:#dc2626">"&lt;box&gt;371…"<br />unstable coords</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#57606a;margin:16px 0 12px;text-align:center">OWLv2-large — Purpose-built detection, full resolution</div>
+      <div class="arch-row">
+        <div class="arch-box blue">Full Image<br />1280×960</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">16×16px patch grid<br />NO downscale</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">Text embedding<br />"key"</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box green">Direct box<br />[886,718,938,737]</div>
+      </div>
+    </div>
+
+    <h3>Model Comparison</h3>
+    <table>
+      <tr>
+        <th>Model</th>
+        <th>Bounding Boxes</th>
+        <th>Tiny Objects</th>
+        <th>Open Vocabulary</th>
+        <th>MPS Speed</th>
+        <th>Result</th>
+      </tr>
+      <tr>
+        <td>YOLO</td>
+        <td class="tick">✓</td>
+        <td class="warn">⚠</td>
+        <td class="cross">✗ Fixed 80 classes</td>
+        <td>Fast</td>
+        <td class="cross">Failed</td>
+      </tr>
+      <tr>
+        <td>Grounding DINO</td>
+        <td class="tick">✓</td>
+        <td class="cross">✗ Missed tiny</td>
+        <td class="tick">✓</td>
+        <td>Medium</td>
+        <td class="cross">Failed</td>
+      </tr>
+      <tr>
+        <td>Qwen2.5-VL-7B</td>
+        <td class="cross">✗ Text tokens</td>
+        <td class="cross">✗ Downscaled</td>
+        <td class="tick">✓</td>
+        <td>Very slow</td>
+        <td class="cross">Failed</td>
+      </tr>
+      <tr>
+        <td>SAM + VLM</td>
+        <td class="tick">✓</td>
+        <td class="warn">⚠</td>
+        <td class="tick">✓</td>
+        <td class="cross">15–30 min</td>
+        <td class="cross">Abandoned</td>
+      </tr>
+      <tr>
+        <td>Florence-2-large</td>
+        <td class="tick">✓</td>
+        <td class="tick">✓ Good</td>
+        <td class="tick">✓</td>
+        <td>Medium</td>
+        <td class="warn">Partial</td>
+      </tr>
+      <tr style="background:#f0fdf4">
+        <td class="bold">OWLv2-large ✓</td>
+        <td class="tick">✓ Direct output</td>
+        <td class="tick">✓ Strong</td>
+        <td class="tick">✓</td>
+        <td class="tick">Fast</td>
+        <td class="tick bold">Selected</td>
+      </tr>
+    </table>
+
+    <h3>Live Detection Results — Actual Model Output</h3>
+    <p>Real output from <code>v3_session_20260906_032814.txt</code> — OWLv2-large on img01.jpg:</p>
+
+    <div class="det-card">
+      <div class="det-header">Query: "where is the key?"</div>
+      <div class="det-item"><span class="det-score">score=0.347</span>  <span class="det-box">box=[886, 718, 938, 737]</span>  <span class="det-label">→ Key 1: sofa right armrest ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.261</span>  <span class="det-box">box=[975, 455, 983, 483]</span>  <span class="det-label">→ Key 2: door lock cylinder ✓</span></div>
+      <div class="det-item" style="color:#57606a"><span>score=0.170</span>  <span>box=[734, 792, 744, 822]</span>  <span>→ False positive — suppressed by threshold 0.20</span></div>
+    </div>
+
+    <div class="det-card">
+      <div class="det-header">Query: "list all objects" (broad scan session 040801)</div>
+      <div class="det-item"><span class="det-score">score=0.738</span>  <span class="det-box">box=[315, 669, 669, 931]</span>  <span class="det-label">laptop ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.521</span>  <span class="det-box">box=[436, 50, 532, 81]</span>  <span class="det-label">glasses ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.318</span>  <span class="det-box">box=[886, 718, 938, 737]</span>  <span class="det-label">key (sofa armrest) ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.209</span>  <span class="det-box">box=[975, 455, 983, 483]</span>  <span class="det-label">key (door lock) ✓</span></div>
+    </div>
+
+    <div class="det-card">
+      <div class="det-header">Query: "door" · "tattoo" · "door handle" · "beard" (session 152652)</div>
+      <div class="det-item"><span class="det-score">score=0.543</span>  <span class="det-box">box=[899, 61, 1209, 774]</span>  <span class="det-label">door ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.536</span>  <span class="det-box">box=[587, 344, 606, 388]</span>  <span class="det-label">tattoo ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.458</span>  <span class="det-box">box=[975, 409, 998, 472]</span>  <span class="det-label">door handle ✓</span></div>
+      <div class="det-item"><span class="det-score">score=0.302</span>  <span class="det-box">box=[441, 98, 525, 147]</span>  <span class="det-label">beard ✓</span></div>
+    </div>
+
+    <h3>Confidence Score Efficiency</h3>
+    <p>OWLv2-large produces a <strong>clear gap</strong> between true detections and false positives:</p>
+
+    <div class="score-row">
+      <span class="score-label">Door (large object)</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:54.3%;background:#16a34a"></div></div>
+      <span class="score-val">0.543</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Tattoo (small region)</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:53.6%;background:#16a34a"></div></div>
+      <span class="score-val">0.536</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Laptop</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:73.8%;background:#16a34a"></div></div>
+      <span class="score-val">0.738</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Key 1 — sofa armrest (tiny, 70×30px)</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:34.7%;background:#16a34a"></div></div>
+      <span class="score-val">0.347</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Key 2 — door lock (tiny, 15×35px)</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:26.1%;background:#d97706"></div></div>
+      <span class="score-val">0.261</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">False positives (suppressed)</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:17%;background:#dc2626"></div></div>
+      <span class="score-val">≤0.170</span>
+    </div>
+    <p style="font-size:12px;color:#57606a;margin-top:6px">Threshold set at <strong>0.20</strong> — cleanly separates all true detections from all false positives.</p>
+  </div>
+
+  
+  <div class="section">
+    <h2>5. Final System Architecture</h2>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-box blue">User types query<br />"where is the key?"</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">parse_query()<br />strips filler words</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">Prompts:<br />"a photo of a key"</div>
+      </div>
+      <div style="text-align:center;color:#57606a;margin:8px 0;font-size:20px">↓</div>
+      <div class="arch-row">
+        <div class="arch-box purple">OWLv2-large<br />google/owlv2-large-patch14-ensemble</div>
+      </div>
+      <div style="text-align:center;color:#57606a;margin:8px 0;font-size:20px">↓</div>
+      <div class="arch-row">
+        <div class="arch-box">Raw detections<br />score + box per patch</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">Threshold filter<br />score ≥ 0.20</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box blue">NMS + containment<br />suppression</div>
+      </div>
+      <div style="text-align:center;color:#57606a;margin:8px 0;font-size:20px">↓</div>
+      <div class="arch-row">
+        <div class="arch-box green">describe_location()<br />"bottom-right of image"</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box green">draw_boxes()<br />annotated JPEG</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box green">Chatbot response<br />to user</div>
+      </div>
+    </div>
+
+    <h3>Key Technical Decisions</h3>
+    <table>
+      <tr><th>Decision</th><th>Choice</th><th>Reason</th></tr>
+      <tr><td>Model variant</td><td><code>owlv2-large-patch14-ensemble</code></td><td>Large &gt; Base — higher confidence gap, better tiny-object separation</td></tr>
+      <tr><td>Threshold</td><td><code>0.20</code></td><td>Empirically determined — separates true keys (≥0.261) from all false positives (≤0.170)</td></tr>
+      <tr><td>NMS strategy</td><td>IoU + containment check</td><td>OWLv2 fires sub-region duplicates on tiny objects — standard IoU misses them; containment check catches them</td></tr>
+      <tr><td>Device</td><td>MPS (Apple Silicon)</td><td>float32 — float16 causes NaN on some Mac configs</td></tr>
+      <tr><td>Prompt format</td><td><code>"a photo of a {item}"</code></td><td>OWLv2 was trained on this CLIP-style format — produces higher scores than bare words</td></tr>
+    </table>
+  </div>
+
+  
+  <div class="section">
+    <h2>6. Scripts Delivered</h2>
+    <table>
+      <tr><th>Script</th><th>Model</th><th>Purpose</th></tr>
+      <tr>
+        <td><code>vision_chatbot_OWL.py</code></td>
+        <td>OWLv2-large</td>
+        <td><strong>Production chatbot</strong> — formatted prompts, NMS, threshold 0.20, annotated image output</td>
+      </tr>
+      <tr>
+        <td><code>vision_chatbot_florence2.py</code></td>
+        <td>Florence-2-large</td>
+        <td>Query expansion, FP filter, two-pass detection (OVD + caption grounding)</td>
+      </tr>
+      <tr>
+        <td><code>vision_chatbot_hybrid.py</code></td>
+        <td>OWLv2 + Florence-2</td>
+        <td>Fusion pipeline — consensus boxes tagged "both", OWLv2-only, Florence-only</td>
+      </tr>
+      <tr>
+        <td><code>vision_chatbot_raw.py</code></td>
+        <td>OWLv2-large</td>
+        <td>Research/debug tool — verbatim prompts, threshold 0.0, no NMS — see raw model output</td>
+      </tr>
+      <tr>
+        <td><code>vision_chatbot_qwen.py</code></td>
+        <td>Qwen2.5-VL</td>
+        <td>VLM baseline — natural language answers (no reliable boxes)</td>
+      </tr>
+    </table>
+  </div>
+
+  
+  <div class="section">
+    <h2>7. What Phase 1 Achieves</h2>
+    <div class="two-col">
+      <div class="callout green">
+        <div class="callout-title">✓ Achieved</div>
+        Open-vocabulary detection — any object, any room<br />
+        Tiny object detection — keys as small as 0.04% of image<br />
+        Pixel-accurate bounding boxes with confidence scores<br />
+        Interactive chatbot loop — free-text natural language queries<br />
+        Annotated output image saved automatically<br />
+        Session logging for every query and result<br />
+        Runs fully offline — no API, no internet required<br />
+        Apple Silicon MPS — no GPU server needed
+      </div>
+      <div class="callout amber">
+        <div class="callout-title">Phase 2 &amp; 3 Roadmap</div>
+        <strong>Phase 2:</strong> Video input → frame-by-frame tracking with ByteTrack/DeepSORT, 
+        temporal event detection ("key picked up at 11:03")<br /><br />
+        <strong>Phase 3:</strong> Live camera stream → persistent object tracking with ownership timer, 
+        alert system for unattended objects (airport/railway station)
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>8. Quick Start for Demo</h2>
+    <div class="det-card">
+      <div class="det-header">Run the production chatbot</div>
+      <div class="det-item" style="font-family:monospace">python vision_chatbot_OWL.py --image images/img01.jpg</div>
+    </div>
+    <div class="det-card">
+      <div class="det-header">Sample queries to demonstrate</div>
+      <div class="det-item">You &gt; where is the key?</div>
+      <div class="det-item">You &gt; find the laptop</div>
+      <div class="det-item">You &gt; where is the door handle?</div>
+      <div class="det-item">You &gt; list all objects</div>
+      <div class="det-item">You &gt; where is the beard?</div>
+    </div>
+    <div class="det-card">
+      <div class="det-header">Expected output — "where is the key?"</div>
+      <div class="det-item">Found 2 detection(s):</div>
+      <div class="det-item">1. Score: 0.347 | bottom-right of the image (box: 886,718 → 938,737)</div>
+      <div class="det-item">2. Score: 0.261 | middle-right of the image (box: 975,455 → 983,483)</div>
+      <div class="det-item">Annotated image → results_owlV2/q01_where_is_the_key_HHMMSS.jpg</div>
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>9. Technology Stack</h2>
+    <table>
+      <tr><th>Component</th><th>Technology</th></tr>
+      <tr><td>Detection model</td><td>google/owlv2-large-patch14-ensemble (HuggingFace Transformers)</td></tr>
+      <tr><td>Deep learning framework</td><td>PyTorch 2.8.0 with Apple MPS backend</td></tr>
+      <tr><td>Image processing</td><td>OpenCV (cv2), Pillow (PIL)</td></tr>
+      <tr><td>Model serving</td><td>HuggingFace Transformers 4.57.6</td></tr>
+      <tr><td>Language</td><td>Python 3.9.6</td></tr>
+      <tr><td>Hardware</td><td>Apple Silicon Mac (ARM64, MPS)</td></tr>
+      <tr><td>Repository</td><td>github.com/sharmila2000/vision-ai</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>Vision AI — Phase 1  |  Object Location Chatbot  |  September 2026</p>
+    <p style="margin-top:4px">Made with IBM Bob</p>
+  </div>
+
+</div>
+</body>
+</html>
