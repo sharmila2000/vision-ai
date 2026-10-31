@@ -76,15 +76,15 @@ class Florence2Verifier:
     actually contains the queried object. Stable on MPS (float32).
     """
 
-    def __init__(self):
-        print(f"[Verifier] Loading {FLORENCE_MODEL_ID} …")
+    def __init__(self, model_id: str = FLORENCE_MODEL_ID):
+        print(f"[Verifier] Loading {model_id} …")
         device_str = "mps" if torch.backends.mps.is_available() else "cpu"
         self.device = torch.device(device_str)
         self.processor = AutoProcessor.from_pretrained(
-            FLORENCE_MODEL_ID, trust_remote_code=True
+            model_id, trust_remote_code=True
         )
         self.model = AutoModelForCausalLM.from_pretrained(
-            FLORENCE_MODEL_ID,
+            model_id,
             dtype=torch.float32,
             trust_remote_code=True,
             attn_implementation="eager",   # required for MPS (avoids SDPA crash)
