@@ -1,5 +1,5 @@
 """
-detector.py — Stage 2: OWLv2 open-vocabulary frame-level detector.
+src/detector.py — OWLv2 open-vocabulary frame-level detector.
 
 Why OWLv2 (proven in Phase 1):
 - Full-resolution patch grid — no spatial downsampling, catches tiny objects.
@@ -7,7 +7,7 @@ Why OWLv2 (proven in Phase 1):
 - Detection-trained (not instruction-tuned) — deterministic, threshold-stable.
 
 Query expansion is applied here: OWLv2 scores vary significantly with exact
-phrasing ("white board" scores 0.54 vs "whiteboard" scores 0.29 on the same
+phrasings ("white board" scores 0.54 vs "whiteboard" scores 0.29 on the same
 object). We probe all variants and collapse results back to the user's term.
 """
 from __future__ import annotations
@@ -18,7 +18,7 @@ import torch
 from PIL import Image
 from transformers import Owlv2ForObjectDetection, Owlv2Processor
 
-from models.types import Detection
+from src.models.types import Detection
 
 # ── constants ──────────────────────────────────────────────────────────────── #
 

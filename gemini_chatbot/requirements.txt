@@ -1,3 +1,0 @@
-google-genai>=1.47.0
-pillow
-python-dotenv

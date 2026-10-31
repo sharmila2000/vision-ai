@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-live_detector.py — Live webcam object detection using OWLv2 and Florence-2.
+src/live_detector.py — Live webcam object detection using OWLv2 and Florence-2.
 
 This script opens your MacBook's FaceTime HD camera, runs the open-vocabulary OWLv2 detector
 on a background thread (to prevent the camera display from lagging), and renders live,
@@ -8,7 +8,7 @@ fully annotated bounding boxes at a buttery-smooth 30 FPS on the main GUI thread
 
 Usage:
     source .venv/bin/activate
-    python live_detector.py --queries "laptop, cup, phone, person"
+    python run.py --queries "laptop, cup, phone, person"
 
 Optional flags:
     --verify           Enable Florence-2 verification (high precision, slightly slower box updates)
@@ -30,11 +30,11 @@ import numpy as np
 from PIL import Image
 
 # Ensure the root of the repo is in the python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from detector import OWLv2Detector
-from verifier import Florence2Verifier
-from models.types import Detection
+from src.detector import OWLv2Detector
+from src.verifier import Florence2Verifier
+from src.models.types import Detection
 
 # Color palette (BGR) for drawing
 _PALETTE = [
@@ -76,7 +76,7 @@ class LiveDetectionWorker:
         else:
             self.detector = OWLv2Detector()
             # Override the default threshold in OWLv2Detector
-            import detector
+            import src.detector as detector
             detector.SCORE_THRESHOLD = threshold
             self.verifier = Florence2Verifier(model_id=florence_model_id) if use_verifier else None
         
@@ -334,8 +334,8 @@ def main():
 
     # 2. Spawn and start our heavy lifting worker thread
     worker = LiveDetectionWorker(
-        queries=queries,
-        use_verifier=args.verify,
+        queries=queries, 
+        use_verifier=args.verify, 
         threshold=args.threshold,
         auto_detect=auto_detect,
         florence_model_id=args.florence_model

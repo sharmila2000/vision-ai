@@ -35,3 +35,5 @@ ultralytics==8.4.140
 ultralytics-thop==2.1.6
 urllib3==2.6.3
 zipp==3.23.1
+google-genai>=1.47.0
+python-dotenv>=1.0.1

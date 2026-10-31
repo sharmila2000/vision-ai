@@ -1,5 +1,5 @@
 """
-verifier.py — Stage 3: Florence-2 crop verification (second opinion).
+src/verifier.py — Stage 3: Florence-2 crop verification (second opinion).
 
 Why a verifier:
   OWLv2 matches patches by text-image cosine similarity. On a moving camera,
@@ -35,7 +35,7 @@ import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, AutoProcessor
 
-from models.types import Detection
+from src.models.types import Detection
 
 # ── constants ──────────────────────────────────────────────────────────────── #
 
